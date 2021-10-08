@@ -1,10 +1,48 @@
 <script>
-export default {};
+export default {
+    setup() {
+        const menus = [
+            {
+                categoryName: 'Api Yönetimi',
+                lists: [
+                    {
+                        title: 'Apiler',
+                        icon: 'fas fa-columns',
+                        submenus: [
+                            { title: 'Yeni Uygulama Oluştur', to: 'a' },
+                            { title: 'Api Uygulamalarını Yönet', to: 'b' }
+                        ]
+                    }
+                ]
+            },
+            {
+                categoryName: 'Hesap',
+                lists: [
+                    {
+                        title: 'Hesap Ayarlarım',
+                        icon: 'fas fa-user',
+                        to: 'c'
+                    },
+                    {
+                        title: 'Hesap Aktivitleri',
+                        icon: 'fas fa-user',
+                        to: 'd'
+                    }
+                ]
+            }
+        ];
+
+        return { menus };
+    }
+};
 </script>
 
 <template>
     <div id="layoutSidenav_nav">
-        <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+        <nav
+            class="sb-sidenav accordion sb-sidenav-light"
+            id="sidenavAccordion"
+        >
             <div class="sb-sidenav-menu">
                 <div class="nav">
                     <div class="sb-sidenav-menu-heading">Ana Sayfa</div>
@@ -12,53 +50,64 @@ export default {};
                         <div class="sb-nav-link-icon">
                             <i class="fas fa-tachometer-alt"></i>
                         </div>
-                        Dashboard
+                        Ana Sayfa
                     </a>
-                    <div class="sb-sidenav-menu-heading">Interface</div>
-                    <a
-                        class="nav-link collapsed"
-                        href="#"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#collapseLayouts"
-                        aria-expanded="false"
-                        aria-controls="collapseLayouts"
-                    >
-                        <div class="sb-nav-link-icon">
-                            <i class="fas fa-columns"></i>
+                    <div v-for="menu in menus" :key="menu.categoryName">
+                        <div class="sb-sidenav-menu-heading">
+                            {{ menu.categoryName }}
                         </div>
-                        Layouts
-                        <div class="sb-sidenav-collapse-arrow">
-                            <i class="fas fa-angle-down"></i>
-                        </div>
-                    </a>
-                    <div
-                        class="collapse"
-                        id="collapseLayouts"
-                        aria-labelledby="headingOne"
-                        data-bs-parent="#sidenavAccordion"
-                    >
-                        <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html"
-                                >Static Navigation</a
-                            >
-                            <a class="nav-link" href="layout-sidenav-light.html"
-                                >Light Sidenav</a
-                            >
-                        </nav>
-                    </div>
+                        <div v-for="list in menu.lists" :key="list.title">
+                            <div v-if="list.submenus">
+                                <a
+                                    class="nav-link collapsed"
+                                    href="#"
+                                    data-bs-toggle="collapse"
+                                    :data-bs-target="`#${list.title}`"
+                                    aria-expanded="false"
+                                    aria-controls="collapseLayouts"
+                                >
+                                    <div class="sb-nav-link-icon">
+                                        <i class="fas fa-columns"></i>
+                                    </div>
+                                    {{ list.title }}
+                                    <div class="sb-sidenav-collapse-arrow">
+                                        <i class="fas fa-angle-down"></i>
+                                    </div>
+                                </a>
+                                <div
+                                    class="collapse"
+                                    :id="list.title"
+                                    aria-labelledby="headingOne"
+                                    data-bs-parent="#sidenavAccordion"
+                                >
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        <a
+                                            v-for="submenu in list.submenus"
+                                            :key="submenu.title"
+                                            class="nav-link"
+                                            :href="submenu.to"
+                                            >{{ submenu.title }}</a
+                                        >
+                                    </nav>
+                                </div>
+                            </div>
 
-                    <div class="sb-sidenav-menu-heading">Addons</div>
-                    <a class="nav-link" href="charts.html">
-                        <div class="sb-nav-link-icon">
-                            <i class="fas fa-chart-area"></i>
+                            <a v-else class="nav-link" :href="list.to">
+                                <div class="sb-nav-link-icon">
+                                    <i :class="list.icon"></i>
+                                </div>
+                                {{ list.title }}
+                            </a>
                         </div>
-                        Charts
-                    </a>
+                    </div>
                 </div>
+            </div>
+            <div class="sb-sidenav-footer">
+                <div class="small">Logged in as:</div>
+                Start Bootstrap
             </div>
         </nav>
     </div>
 </template>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
