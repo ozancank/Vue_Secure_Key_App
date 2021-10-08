@@ -2,17 +2,19 @@
 export default {
     setup() {
         const dropdownItems = [
-            { title: 'Hesap Ayarları', to: 'a' },
-            { title: 'Hesap Aktiviteleri', to: 'b' },
+            { title: 'Hesap Ayarları', to: 'accountSettings' },
+            { title: 'Hesap Aktiviteleri', to: 'accountLogs' }
         ];
         return { dropdownItems };
-    },
+    }
 };
 </script>
 
 <template>
     <nav class="sb-topnav navbar navbar-expand navbar-light bg-light">
-        <a class="navbar-brand ps-3" href="index.html">Secure Key</a>
+        <router-link class="navbar-brand ps-3" :to="{ name: 'home' }"
+            >Secure Key</router-link
+        >
         <button
             class="ms-auto btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
             id="sidebarToggle"
@@ -39,17 +41,18 @@ export default {
                         v-for="dropdownItem in dropdownItems"
                         :key="dropdownItem.title"
                     >
-                        <a class="dropdown-item" :href="dropdownItem.to">{{
-                            dropdownItem.title
-                        }}</a>
+                        <router-link
+                            class="dropdown-item"
+                            :to="{ name: dropdownItem.to }"
+                            >{{ dropdownItem.title }}</router-link
+                        >
                     </li>
                     <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" href="#!">Çıkış</a></li>
+                    <li><a class="dropdown-item" href="#!">Çıkış Yap</a></li>
                 </ul>
             </li>
         </ul>
     </nav>
 </template>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

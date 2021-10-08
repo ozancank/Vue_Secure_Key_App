@@ -1,13 +1,11 @@
 <script>
 import AppNavbar from '@/components/AppNavbar.vue';
 import AppSidebar from '@/components/AppSidebar.vue';
-import AppBase from '@/components/AppBase.vue';
 
 export default {
     components: {
         AppNavbar,
         AppSidebar,
-        AppBase
     }
 };
 </script>
@@ -17,9 +15,7 @@ export default {
         <AppNavbar />
         <div id="layoutSidenav">
             <AppSidebar />
-            <AppBase>
-                <h1>Main Content</h1>
-            </AppBase>
+            <router-view></router-view>
             <!-- <footer class="py-4 bg-light mt-auto"></footer> -->
         </div>
     </div>

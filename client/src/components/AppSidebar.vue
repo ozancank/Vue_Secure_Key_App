@@ -9,8 +9,8 @@ export default {
                         title: 'Apiler',
                         icon: 'fas fa-columns',
                         submenus: [
-                            { title: 'Yeni Uygulama Oluştur', to: 'a' },
-                            { title: 'Api Uygulamalarını Yönet', to: 'b' }
+                            { title: 'Yeni Uygulama Oluştur', to: 'apiCreate' },
+                            { title: 'Api Uygulamalarını Yönet', to: 'apiList' }
                         ]
                     }
                 ]
@@ -21,12 +21,12 @@ export default {
                     {
                         title: 'Hesap Ayarlarım',
                         icon: 'fas fa-user',
-                        to: 'c'
+                        to: 'accountSettings'
                     },
                     {
                         title: 'Hesap Aktivitleri',
                         icon: 'fas fa-user',
-                        to: 'd'
+                        to: 'accountLogs'
                     }
                 ]
             }
@@ -46,12 +46,12 @@ export default {
             <div class="sb-sidenav-menu">
                 <div class="nav">
                     <div class="sb-sidenav-menu-heading">Ana Sayfa</div>
-                    <a class="nav-link" href="index.html">
+                    <router-link class="nav-link" :to="{ name: 'home' }">
                         <div class="sb-nav-link-icon">
                             <i class="fas fa-tachometer-alt"></i>
                         </div>
                         Ana Sayfa
-                    </a>
+                    </router-link>
                     <div v-for="menu in menus" :key="menu.categoryName">
                         <div class="sb-sidenav-menu-heading">
                             {{ menu.categoryName }}
@@ -81,23 +81,28 @@ export default {
                                     data-bs-parent="#sidenavAccordion"
                                 >
                                     <nav class="sb-sidenav-menu-nested nav">
-                                        <a
+                                        <router-link
                                             v-for="submenu in list.submenus"
                                             :key="submenu.title"
                                             class="nav-link"
-                                            :href="submenu.to"
-                                            >{{ submenu.title }}</a
+                                            :to="{ name: submenu.to }"
                                         >
+                                            {{ submenu.title }}
+                                        </router-link>
                                     </nav>
                                 </div>
                             </div>
 
-                            <a v-else class="nav-link" :href="list.to">
+                            <router-link
+                                v-else
+                                class="nav-link"
+                                :to="{ name: list.to }"
+                            >
                                 <div class="sb-nav-link-icon">
                                     <i :class="list.icon"></i>
                                 </div>
                                 {{ list.title }}
-                            </a>
+                            </router-link>
                         </div>
                     </div>
                 </div>

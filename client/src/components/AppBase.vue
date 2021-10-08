@@ -10,11 +10,9 @@ export default {
 
 <template>
     <div id="layoutSidenav_content">
-        <main>
+        <main class="container-fluid">
             <AppBreadcrumb :items="['Anasayfa']" />
-            <div class="container-fluid">
-                <slot></slot>
-            </div>
+            <slot></slot>
         </main>
     </div>
 </template>
