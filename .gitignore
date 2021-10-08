@@ -144,9 +144,7 @@ dist
 docs/_book
 yarn.lock
 *-lock.json
-./passwd.js
 /passwd.js
-passwd.js
 
 test/
 server/uploads/files/*.jpg
