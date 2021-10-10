@@ -12,7 +12,7 @@ export default {
 
         function logout() {
             removeToken();
-            router.push({ name: 'login' });
+            window.location.href = 'http://localhost:8080';
         }
 
         return { logout, dropdownItems };
