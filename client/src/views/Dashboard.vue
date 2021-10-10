@@ -16,7 +16,6 @@ export default {
         <div id="layoutSidenav">
             <AppSidebar />
             <router-view></router-view>
-            <!-- <footer class="py-4 bg-light mt-auto"></footer> -->
         </div>
     </div>
 </template>

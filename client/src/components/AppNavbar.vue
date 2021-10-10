@@ -1,11 +1,21 @@
 <script>
+import { removeToken } from '../utils';
+import { useRouter } from 'vue-router';
+
 export default {
     setup() {
+        const router = useRouter();
         const dropdownItems = [
             { title: 'Hesap Ayarları', to: 'accountSettings' },
             { title: 'Hesap Aktiviteleri', to: 'accountLogs' }
         ];
-        return { dropdownItems };
+
+        function logout() {
+            removeToken();
+            router.push({ name: 'login' });
+        }
+
+        return { logout, dropdownItems };
     }
 };
 </script>
@@ -48,7 +58,11 @@ export default {
                         >
                     </li>
                     <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" href="#!">Çıkış Yap</a></li>
+                    <li>
+                        <a class="dropdown-item" href="#" @click="logout">
+                            Çıkış Yap
+                        </a>
+                    </li>
                 </ul>
             </li>
         </ul>
