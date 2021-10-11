@@ -3,8 +3,25 @@ import AuthModule from './module/authModule';
 import LogModule from './module/logModule';
 
 export default createStore({
-    state: {},
-    mutations: {},
+    state: {
+        alertData: {
+            show: false,
+            text: '',
+            alertClass: ''
+        }
+    },
+    getters: {
+        alertData: state => state.alertData
+    },
+    mutations: {
+        showAlert(state, alertInfo) {
+            state.alertData = {
+                show: true,
+                text: alertInfo.text,
+                alertClass: alertInfo.alertClass
+            };
+        }
+    },
     actions: {},
     modules: {
         AuthModule,

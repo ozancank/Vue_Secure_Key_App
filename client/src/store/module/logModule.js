@@ -27,8 +27,11 @@ const actions = {
                 userid: localStorage.userId
             }
         });
-        if (response.status == 200) {
+        if (response.data.status) {
             vuexContext.commit('setLogs', []);
+            return [true, response.data.message];
+        } else {
+            return [false, response.data.message];
         }
     }
 };

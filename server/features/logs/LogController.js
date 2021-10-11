@@ -14,9 +14,10 @@ class LogController {
     async removeAllLogs(req, res) {
         const { userid: userId } = req.headers;
         const deleteAll = await LogModel.deleteMany({ userId });
-        console.log(deleteAll);
         if (deleteAll.deletedCount > 0) {
-            res.status(200).json({ message: 'Geçmiş Kayıtları Silinmiştir' });
+            res.status(200).json({status:true, message: 'Geçmiş Kayıtları Silinmiştir' });
+        } else {
+            res.status(200).json({status:false, message: 'Geçmiş Kayıtlarınız Silinmedi' });
         }
     }
 }

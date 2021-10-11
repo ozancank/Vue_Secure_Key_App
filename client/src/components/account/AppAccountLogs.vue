@@ -16,8 +16,13 @@ export default {
             const dateFormat = new Date(date);
             return dateFormat.toLocaleString('tr-TR');
         }
-        function deleteLogs() {
-            store.dispatch('LogModule/removeAllLogs');
+        async function deleteLogs() {
+            const result = await store.dispatch('LogModule/removeAllLogs');
+            store.commit('showAlert', {
+                show: true,
+                text: result[1],
+                alertClass: result[0] ? 'success' : 'danger'
+            });
         }
         function filterLogs(type) {
             if (type == 'auth') {
@@ -94,13 +99,15 @@ export default {
             <option value="all">Hepsini Göster</option>
         </select>
 
+        <AppAlert></AppAlert>
+
         <table class="table table-striped">
             <thead>
                 <th>İşlem</th>
                 <th>Tür</th>
                 <th>Tarih</th>
             </thead>
-            <tbody>
+            <tbody v-if="logs.value.length">
                 <tr v-for="log in logs.value" :key="log.id">
                     <td>{{ log.description }}</td>
                     <td>
@@ -122,6 +129,16 @@ export default {
                         </button>
                     </td>
                     <td>{{ formatedDate(log.createdAt) }}</td>
+                </tr>
+            </tbody>
+            <tbody v-else>
+                <tr>
+                    <td colspan="3">
+                        <p class="d-flex">
+                            <i class="fa fa-info-circle fa-2x me-3"></i> Geçmiş
+                            Kayıtlarınız Burada Görünür
+                        </p>
+                    </td>
                 </tr>
             </tbody>
         </table>
