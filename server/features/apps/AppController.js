@@ -1,4 +1,4 @@
-import { validate } from '../../utils';
+import { createLog, getAppName } from '../../utils';
 import AppModel from './AppModel';
 
 class AppController {
@@ -6,44 +6,48 @@ class AppController {
         try {
             const { name, apiKey, description } = req.body;
             const { userid: userId } = req.headers;
-            const result = validate([
-                {
-                    text: name || '',
-                    check: ['required', 'maxLength:50'],
-                    messages: [
-                        'Uygulama İsmini lütfen Belirtin',
-                        'Uygulama İsmi En Fazla 50 Karakter Olabilir',
-                    ],
-                },
-                {
-                    text: apiKey || '',
-                    check: ['required', 'maxLength:200'],
-                    messages: [
-                        'Api Anahtarınızı lütfen Belirtin',
-                        'Anahtar En Fazla 200 Karakter Olabilir',
-                    ],
-                },
-                {
-                    text: description || '',
-                    check: ['maxLength:500'],
-                    messages: ['Açıklama En Fazla 500 Karakter Olabilir'],
-                },
-            ]);
+            const app = await AppModel.create({
+                name,
+                apiKey,
+                description,
+                userId,
+            });
+            res.status(200).json({
+                status: true,
+                message: 'Uygulamanız Oluşturulmuştur.',
+                app,
+            });
+            createLog({
+                type: 'app',
+                userId,
+                description: `${name} adında yeni bir uygulama oluşturdunuz`,
+            });
+        } catch (error) {
+            console.log(error);
+            return next(
+                new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin')
+            );
+        }
+    }
 
-            if (result == true) {
-                const app = await AppModel.create({
-                    name,
-                    apiKey,
-                    description,
-                    userId,
-                });
+    async deleteApp(req, res, next) {
+        try {
+            const { id: _id } = req.params;
+            const { userid: userId } = req.headers;
+            const appName = await getAppName(_id);
+            const deleteApp = await AppModel.deleteOne({ _id });
+            if (deleteApp.deletedCount == 1) {
                 res.status(200).json({
                     status: true,
-                    message: 'Uygulamanız Oluşturulmuştur.',
-                    app,
+                    message: 'Uygulamanız Kaldırılmıştır.',
+                });
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${appName} uygulamasını kaldırdınız`,
                 });
             } else {
-                return next(new Error(result));
+                return next(new Error('Bu uygulama bulunamadı.'));
             }
         } catch (error) {
             console.log(error);
@@ -57,68 +61,31 @@ class AppController {
         try {
             const { name, apiKey, description, limit, time } = req.body;
             const { id: _id } = req.params;
-            const result = validate([
+            const { userid: userId } = req.headers;
+            const appName = await getAppName(_id);
+            const app = await AppModel.updateOne(
+                { _id, userId },
                 {
-                    text: name || '',
-                    check: ['required', 'maxLength:50'],
-                    messages: [
-                        'Uygulama İsmini lütfen Belirtin',
-                        'Uygulama İsmi En Fazla 50 Karakter Olabilir',
-                    ],
-                },
-                {
-                    text: apiKey || '',
-                    check: ['required', 'maxLength:200'],
-                    messages: [
-                        'Api Anahtarınızı lütfen Belirtin',
-                        'Anahtar En Fazla 200 Karakter Olabilir',
-                    ],
-                },
-                {
-                    text: limit || '',
-                    check: ['required', 'number'],
-                    messages: [
-                        'Limiti lütfen Belirtin',
-                        'Limit Sadece Rakamlardan Oluşmalıdır',
-                    ],
-                },
-                {
-                    text: time || '',
-                    check: ['required', 'number'],
-                    messages: [
-                        'Süreyi lütfen Belirtin',
-                        'Süre Sadece Rakamlardan Oluşmalıdır',
-                    ],
-                },
-                {
-                    text: description || '',
-                    check: ['maxLength:500'],
-                    messages: ['Açıklama En Fazla 500 Karakter Olabilir'],
-                },
-            ]);
-
-            if (result == true) {
-                const app = await AppModel.updateOne(
-                    { _id },
-                    {
-                        name,
-                        apiKey,
-                        description,
-                        limit,
-                        time,
-                    }
-                );
-                if (app.matchedCount == 1) {
-                    res.status(200).json({
-                        status: true,
-                        message: 'Uygulamanız Güncellenmiştir.',
-                        app,
-                    });
-                } else {
-                    return next(new Error('Bu uygulama bulunamadı.'));
+                    name,
+                    apiKey,
+                    description,
+                    limit,
+                    time,
                 }
+            );
+            if (app.matchedCount == 1) {
+                res.status(200).json({
+                    status: true,
+                    message: 'Uygulamanız Güncellenmiştir.',
+                    app,
+                });
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${appName} uygulamasını güncellediniz - (${name})`,
+                });
             } else {
-                return next(new Error(result));
+                return next(new Error('Bu uygulama bulunamadı.'));
             }
         } catch (error) {
             console.log(error);
@@ -132,9 +99,10 @@ class AppController {
         try {
             const { id: _id } = req.params;
             const { ipAddress } = req.body;
+            const { userid: userId } = req.headers;
             const add = await AppModel.updateOne(
                 {
-                    _id,
+                    _id,userId
                 },
                 {
                     $push: { blockList: ipAddress },
@@ -144,6 +112,11 @@ class AppController {
                 res.status(200).json({
                     status: true,
                     message: `${ipAddress} yasaklı listesine eklendi.`,
+                });
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${ipAddress} yasaklı listeye eklediniz.`,
                 });
             } else {
                 return next(new Error('Bu uygulama bulunamadı.'));
@@ -160,9 +133,10 @@ class AppController {
         try {
             const { id: _id } = req.params;
             const { ipAddress } = req.body;
+            const { userid: userId } = req.headers;
             const add = await AppModel.updateOne(
                 {
-                    _id,
+                    _id,userId
                 },
                 {
                     $push: { allowList: ipAddress },
@@ -172,6 +146,11 @@ class AppController {
                 res.status(200).json({
                     status: true,
                     message: `${ipAddress} izin verilen listesine eklendi.`,
+                });
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${ipAddress} izin verilen listeye eklediniz.`,
                 });
             } else {
                 return next(new Error('Bu uygulama bulunamadı.'));
@@ -188,9 +167,10 @@ class AppController {
         try {
             const { id: _id } = req.params;
             const { ipAddress } = req.body;
+            const { userid: userId } = req.headers;
             const add = await AppModel.updateOne(
                 {
-                    _id,
+                    _id,userId
                 },
                 {
                     $pull: { blockList: ipAddress },
@@ -200,6 +180,11 @@ class AppController {
                 res.status(200).json({
                     status: true,
                     message: `${ipAddress} yasaklı listesinden kaldırıldı.`,
+                });
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${ipAddress} yasaklı listesinden kaldırdınız.`,
                 });
             } else {
                 return next(new Error('Bu uygulama bulunamadı.'));
@@ -211,14 +196,15 @@ class AppController {
             );
         }
     }
-    
+
     async removeAllowList(req, res, next) {
         try {
             const { id: _id } = req.params;
             const { ipAddress } = req.body;
+            const { userid: userId } = req.headers;
             const add = await AppModel.updateOne(
                 {
-                    _id,
+                    _id,userId
                 },
                 {
                     $pull: { allowList: ipAddress },
@@ -228,6 +214,11 @@ class AppController {
                 res.status(200).json({
                     status: true,
                     message: `${ipAddress} izin verilen listesinden kaldırıldı.`,
+                });
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${ipAddress} izin verilen listesinden kaldırdınız.`,
                 });
             } else {
                 return next(new Error('Bu uygulama bulunamadı.'));

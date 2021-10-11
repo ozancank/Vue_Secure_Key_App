@@ -12,6 +12,7 @@ app.use(cors({ origin: 'http://localhost:8080' }));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(router);
+
 app.use((err, req, res, next) => {
     console.log(err);
     res.status(500).json({ status: false, message: err.message });

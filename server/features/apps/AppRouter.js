@@ -1,14 +1,24 @@
 import express from 'express';
 import AppController from './AppController';
-import { ipIsValid } from '../../middlewares';
+import { ipIsValid, ipIsUnique, nameIsUnique } from '../../middlewares';
 
 const router = express.Router();
 const appController = new AppController();
 
-router.post('/', appController.createApp);
-router.put('/:id', appController.updateApp);
-router.post('/add-to-block-list/:id', ipIsValid, appController.addBlockList);
-router.post('/add-to-allow-list/:id', ipIsValid, appController.addAllowList);
+router.post('/', nameIsUnique, appController.createApp);
+router.put('/:id', nameIsUnique, appController.updateApp);
+router.post(
+    '/add-to-block-list/:id',
+    ipIsValid,
+    ipIsUnique,
+    appController.addBlockList
+);
+router.post(
+    '/add-to-allow-list/:id',
+    ipIsValid,
+    ipIsUnique,
+    appController.addAllowList
+);
 router.post(
     '/remove-to-allow-list/:id',
     ipIsValid,
@@ -19,5 +29,6 @@ router.post(
     ipIsValid,
     appController.removeBlockList
 );
+router.delete('/:id', appController.deleteApp);
 
 export default router;

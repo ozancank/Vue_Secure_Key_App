@@ -1,11 +1,42 @@
 import jwt from 'jsonwebtoken';
+import axios from 'axios';
+import LogModel from '../features/logs/LogModel';
+//import ip from 'ip'
+import publicIp from 'public-ip';
+import AppModel from '../features/apps/AppModel';
+
+const emailRegex =
+    /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
 export const toJsonWebToken = (obj) => {
     return jwt.sign({ obj }, process.env.JWT_SECRET_ID);
 };
 
-const emailRegex =
-    /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+export const createLog = async ({ type, userId, description }) => {
+    const ip = await publicIp.v4();
+    const ipLocation = await getIpLocation(ip);
+    const log = await LogModel.create({
+        type,
+        userId,
+        ipLocation,
+        description,
+    });
+    return log;
+};
+
+export const getAppName = async (_id) => {
+    const appName = await AppModel.findOne({ _id });
+    return appName.name;
+};
+
+export const getIpLocation = async (ipAddress) => {
+    const response = await axios.get(
+        `http://api.ipapi.com/${ipAddress}?access_key=${process.env.IPAPI_SERVICE}`
+    );
+    const { continent_code, country_name, country_code, latitude, longitude } =
+        response.data;
+    return { continent_code, country_name, country_code, latitude, longitude };
+};
 
 export const validate = (fields) => {
     const errors = [];

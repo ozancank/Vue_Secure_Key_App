@@ -1,5 +1,5 @@
 <template>
-    <AppBase>
+    <AppBase :menuItems="['Ana sayfa']">
         <h1>account settings</h1>
     </AppBase>
 </template>

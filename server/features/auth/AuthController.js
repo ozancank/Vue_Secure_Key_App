@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { toJsonWebToken } from '../../utils/index';
+import { toJsonWebToken, createLog } from '../../utils/index';
 
 class AuthController {
     async authorize(req, res) {
@@ -31,6 +31,11 @@ class AuthController {
                 id,
             })}`
         );
+        createLog({
+            type: 'auth',
+            userId: id,
+            description: `Giriş yaptınız`,
+        });
     }
 }
 

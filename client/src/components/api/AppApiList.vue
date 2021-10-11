@@ -9,7 +9,7 @@ export default {
 </script>
 
 <template>
-    <AppBase>
+    <AppBase :menuItems="['Ana sayfa']">
         <h1>api list</h1>
     </AppBase>
 </template>

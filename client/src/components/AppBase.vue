@@ -2,6 +2,11 @@
 import AppBreadcrumb from '@/components/AppBreadcrumb.vue';
 
 export default {
+    props: {
+        menuItems: {
+            type: Array,                        
+        }
+    },
     components: {
         AppBreadcrumb
     }
@@ -11,7 +16,7 @@ export default {
 <template>
     <div id="layoutSidenav_content">
         <main class="container-fluid">
-            <AppBreadcrumb :items="['Anasayfa']" />
+            <AppBreadcrumb :items="menuItems" />
             <slot></slot>
         </main>
     </div>
