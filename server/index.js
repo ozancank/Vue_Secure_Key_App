@@ -1,14 +1,12 @@
 import express from 'express';
 import router from './router';
 import dotenv from 'dotenv';
-import cors from 'cors';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 
 dotenv.config();
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:8080' }));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(router);

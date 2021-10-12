@@ -6,6 +6,7 @@ const router = express.Router();
 const appController = new AppController();
 
 router.post('/', nameIsUnique, appController.createApp);
+router.get('/api-service/:slug/:userId', appController.getApiKey);
 router.put('/:id', nameIsUnique, appController.updateApp);
 router.post(
     '/add-to-block-list/:id',
