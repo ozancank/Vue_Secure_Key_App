@@ -30,22 +30,6 @@ class AppController {
         }
     }
 
-    async getApiKey(req, res, next) {
-        try {
-            const { slug, userId } = req.params;
-            const apiKey = await AppModel.findOne({ slug, userId }).select({
-                apiKey: 1,
-                _id: 0,
-            });
-            res.status(200).json({ apiKey: apiKey.apiKey });
-        } catch (error) {
-            console.log(error);
-            return next(
-                new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin')
-            );
-        }
-    }
-
     async deleteApp(req, res, next) {
         try {
             const { id: _id } = req.params;

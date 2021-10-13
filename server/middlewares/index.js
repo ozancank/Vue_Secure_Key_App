@@ -75,3 +75,18 @@ export const nameIsUnique = async (req, res, next) => {
         next(new Error(result));
     }
 };
+
+export const apiControl = async (req, res, next) => {
+    const { slug, userId } = req.params;
+    const api = await AppModel.findOne({ slug, userId }).select({
+        apiKey: 1,
+        _id: 0,
+    });
+    if (api) {
+        console.log(api.apiKey);
+        req.api = api.apiKey;
+        next();
+    } else {
+        next(new Error('Böyle bir servis bulunamadı'));
+    }
+};
