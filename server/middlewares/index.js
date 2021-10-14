@@ -1,5 +1,6 @@
 import AppModel from '../features/apps/AppModel';
 import { validate } from '../utils';
+import publicIp from 'public-ip';
 
 const IP_ADDRESS_REGEX = /^(?:[0-9]{1,3}.){3}[0-9]{1,3}$/;
 
@@ -76,16 +77,39 @@ export const nameIsUnique = async (req, res, next) => {
     }
 };
 
+let requestList = [];
 export const apiControl = async (req, res, next) => {
     const { slug, userId } = req.params;
-    const api = await AppModel.findOne({ slug, userId }).select({
-        apiKey: 1,
-        _id: 0,
-    });
+    const api = await AppModel.findOne({ slug, userId });
     if (api) {
-        console.log(api.apiKey);
-        req.api = api.apiKey;
-        next();
+        const ipAddress = await publicIp.v4();
+        const { time, limit, blockList, allowList, _id } = api;
+        const request = requestList.filter((item) => item == _id);
+        if (request.length > limit) {
+            next(new Error('Lütfen daha sonra tekrar deneyin'));
+            setTimeout(() => {
+                requestList = requestList.filter((item) => item != _id);
+                console.log('clear!');
+            }, time);
+        } else {
+            if (allowList.length) {
+                if (allowList.includes(ipAddress)) {
+                    req.api = api;
+                    requestList.push(_id.toString());
+                    next();
+                } else {
+                    next(new Error('Bu servise erişim izniniz yok.'));
+                }
+            } else {
+                if (blockList.includes(ipAddress)) {
+                    next(new Error('Bu servise erişim izniniz yok.'));
+                } else {
+                    req.api = api;
+                    requestList.push(_id.toString());
+                    next();
+                }
+            }
+        }
     } else {
         next(new Error('Böyle bir servis bulunamadı'));
     }

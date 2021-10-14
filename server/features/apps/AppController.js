@@ -1,5 +1,7 @@
 import { createLog, getAppName } from '../../utils';
 import AppModel from './AppModel';
+import AppLogModel from './AppLogModel';
+import mongoose from 'mongoose';
 
 class AppController {
     async createApp(req, res, next) {
@@ -233,6 +235,35 @@ class AppController {
                 new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin')
             );
         }
+    }
+
+    async getAppLogs(req, res, next) {
+        try {
+            const { id: appId } = req.params;
+            const logs = await AppLogModel.find({ appId });
+            res.status(200).json(logs);
+        } catch (error) {
+            console.log(error);
+            return next(
+                new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin')
+            );
+        }
+    }
+
+    async getLogsByDate(req, res, next) {
+        const { id: appId } = req.params;
+        const dates = await AppLogModel.aggregate([
+            {
+                $match: { appId: mongoose.Types.ObjectId(appId) },
+            },
+            {
+                $group: {
+                    _id: '$date',
+                    total: { $sum: 1 },
+                },
+            },
+        ]);
+        res.status(200).json(dates);
     }
 }
 
