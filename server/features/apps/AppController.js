@@ -32,6 +32,31 @@ class AppController {
         }
     }
 
+    async listApps(req, res, next) {
+        try {
+            const { userid: userId } = req.headers;
+            const apps = await AppModel.find({ userId });
+            res.status(200).json(apps);
+        } catch (error) {
+            new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin');
+        }
+    }
+
+    async listApp(req, res, next) {
+        try {
+            const { id: _id } = req.params;
+            const { userid: userId } = req.headers;
+            const app = await AppModel.findOne({ _id, userId });
+            if (app) {
+                res.status(200).json(app);
+            } else {
+                return next(new Error('Bu uygulama bulunamadı.'));
+            }
+        } catch (error) {
+            new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin');
+        }
+    }
+
     async deleteApp(req, res, next) {
         try {
             const { id: _id } = req.params;

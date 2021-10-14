@@ -5,6 +5,8 @@ import { ipIsValid, ipIsUnique, nameIsUnique } from '../../middlewares';
 const router = express.Router();
 const appController = new AppController();
 
+router.get('/', appController.listApps);
+router.get('/:id', appController.listApp);
 router.post('/', nameIsUnique, appController.createApp);
 router.put('/:id', nameIsUnique, appController.updateApp);
 router.get('/app-logs/:id', appController.getAppLogs);

@@ -6,4 +6,7 @@ export const decodedJwt = token => {
 
 export const isTokenExist = _ => (localStorage.userToken ? true : false);
 
-export const removeToken = _ => delete localStorage.userToken;
+export const removeToken = _ => {
+    delete localStorage.userToken;
+    delete localStorage.userId;
+};

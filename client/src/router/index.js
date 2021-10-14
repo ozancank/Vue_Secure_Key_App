@@ -39,6 +39,11 @@ const routes = [
                 name: 'apiList'
             },
             {
+                path: '/app/:id',
+                component: () => import('@/components/api/AppApiDetail'),
+                name: 'apiDetail'
+            },
+            {
                 path: '/account-settings',
                 component: () =>
                     import('@/components/account/AppAccountSettings'),
