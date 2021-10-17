@@ -7,15 +7,14 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "axios": "^0.22.0",
-    "billboard.js": "^3.2.0",
-    "core-js": "^3.6.5",
+    "axios": "^0.23.0",
+    "core-js": "^3.18.3",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.0.10",
-    "sass": "^1.42.1",
+    "mongoose": "^6.0.11",
+    "sass": "^1.43.2",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0"
+    "vue-router": "^4.0.0-rc.6",
+    "vuex": "^4.0.0-rc.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

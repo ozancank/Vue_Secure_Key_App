@@ -1,6 +1,6 @@
 <template>
     <AppBase>
-        <h1>Hata</h1>
+        <h1>Beklenmedik bir hata oluştu lütfen daha sonra tekrar deneyin.</h1>
     </AppBase>
 </template>
 

@@ -114,10 +114,21 @@ const actions = {
     },
 
     async deleteApp(vuexContext, id) {
-        const response = await axios.delete(`${API}/${id}`);
+        const response = await axios.delete(`${API}/app/${id}`, {
+            headers: HEADERS
+        });
         if (response.status == 200) {
             vuexContext.dispatch('listApps');
             router.push({ name: 'apiList' });
+        }
+    },
+
+    async deleteAllApps(vuexContext) {
+        const response = await axios.delete(`${API}/app/all`, {
+            headers: HEADERS
+        });
+        if (response.status == 200) {
+            return true;
         }
     }
 };

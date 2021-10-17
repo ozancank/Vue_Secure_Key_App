@@ -62,7 +62,7 @@ class AppController {
             const { id: _id } = req.params;
             const { userid: userId } = req.headers;
             const appName = await getAppName(_id);
-            const deleteApp = await AppModel.deleteOne({ _id });
+            const deleteApp = await AppModel.deleteOne({ _id, userId });
             if (deleteApp.deletedCount == 1) {
                 res.status(200).json({
                     status: true,
@@ -76,6 +76,27 @@ class AppController {
             } else {
                 return next(new Error('Bu uygulama bulunamadı.'));
             }
+        } catch (error) {
+            console.log(error);
+            return next(
+                new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin')
+            );
+        }
+    }
+
+    async deleteAllApps(req, res, next) {
+        try {
+            const { userid: userId } = req.headers;
+            const deleteApp = await AppModel.deleteMany({ userId });
+            res.status(200).json({
+                status: true,
+                message: 'Uygulamanız Kaldırılmıştır.',
+            });
+            createLog({
+                type: 'app',
+                userId,
+                description: `Bütün uygulamaları kaldırdınız`,
+            });
         } catch (error) {
             console.log(error);
             return next(

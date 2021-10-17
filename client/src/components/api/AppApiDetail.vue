@@ -1,9 +1,8 @@
 <script>
-import { computed, ref, onMounted, watch } from '@vue/reactivity';
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import AppNotExist from '../AppNotExist';
-import bb from 'billboard.js';
 
 export default {
     components: {
@@ -116,33 +115,30 @@ export default {
             store.dispatch('AppModule/deleteApp', route.params.id);
         }
 
-        // var chart;
+        var chart;
 
-        // // watch(appLogsGroup, (newValue, oldValue) => {
-        // //     const chartItems = ['Tarihe göre istekler'];
-        // //     newValue.forEach(item => chartItems.push(item.total));
-        // //     chart.load({
-        // //         columns: [chartItems]
-        // //     });
-        // // });
+        onMounted(() => {
+            chart = bb.generate({
+                data: {
+                    columns: [],
+                    type: 'bar'
+                },
+                bar: {
+                    width: {
+                        ratio: 0.5
+                    }
+                },
+                bindto: '#barChart'
+            });
+        });
 
-        // onMounted(() => {
-        //     chart = bb.generate({
-        //         data: {
-        //             columns: [
-        //                 ['data1', 30, 200, 100, 400, 150, 250],
-        //                 ['data2', 130, 100, 140, 200, 150, 50]
-        //             ],
-        //             type: 'bar' // for ESM specify as: bar()
-        //         },
-        //         bar: {
-        //             width: {
-        //                 ratio: 0.5
-        //             }
-        //         },
-        //         bindto: '#barChart'
-        //     });
-        // });
+        watch(logGroup, (newValue, oldValue) => {
+            const chartItems = ['Tarihe göre istekler'];
+            newValue.forEach(item => chartItems.push(item.total));
+            chart.load({
+                columns: [chartItems]
+            });
+        });
 
         return {
             user,
@@ -168,6 +164,32 @@ export default {
 
 <template>
     <AppBase v-if="app" :menuItems="['Ana Sayfa', 'Uygulamalar', app.name]">
+        <AppModal title="Silme İşlemini Onayla">
+            <div class="modal-body">
+                <p>
+                    Bu uygulamayı kaldırmak istediğinizden emin misiniz?
+                    Uygulamalarınızda hataya sebep olabilir.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Kapat
+                </button>
+                <button
+                    type="button"
+                    @click="deleteApp"
+                    class="btn btn-danger"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                >
+                    Evet
+                </button>
+            </div>
+        </AppModal>
         <div
             class="alert alert-primary"
             v-if="app.limit == 10 && app.time == 10000"
@@ -238,7 +260,7 @@ export default {
                 </div>
                 <div class="mt-5">
                     <b>İstek Logları</b>
-                    <table class="table table-striped">
+                    <table class="table table-striped" v-if="appLogs">
                         <thead>
                             <th>IP Adresi</th>
                             <th>Tarih</th>
@@ -253,9 +275,9 @@ export default {
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-5">
+                <div class="mt-5" v-if="logGroup.length > 0">
                     <h1>Graphichs</h1>
-                    {{ logGroup }}
+                    <br />
                     <div id="barChart"></div>
                 </div>
             </div>
@@ -398,6 +420,13 @@ export default {
                         ></AppNotExist>
                     </table>
                 </div>
+                <button
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
+                    class="btn btn-danger btn-sm mb-3"
+                >
+                    Uygulamayı Sil
+                </button>
             </div>
         </div>
     </AppBase>

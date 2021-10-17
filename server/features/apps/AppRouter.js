@@ -33,6 +33,7 @@ router.post(
     ipIsValid,
     appController.removeBlockList
 );
+router.delete('/all', appController.deleteAllApps);
 router.delete('/:id', appController.deleteApp);
 
 export default router;
