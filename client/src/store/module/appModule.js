@@ -64,8 +64,8 @@ const actions = {
 
     async updateApp(vuexContext, payload) {
         try {
-            const response = await axios.post(
-                `${API}/app/${payload.path}/${payload.id}`,
+            const response = await axios.put(
+                `${API}/app/${payload.id}`,
                 JSON.stringify(payload.body),
                 { headers: HEADERS }
             );
@@ -87,15 +87,15 @@ const actions = {
             } else if (payload.path == 'add-to-allow-list') {
                 vuexContext.state.app.allowList.push(payload.body.ipAddress);
             } else if (payload.path == 'remove-to-block-list') {
-                vuexContext.state.app.blockList.splice(
-                    payload.body.ipAddress,
-                    1
+                const index = vuexContext.state.app.blockList.indexOf(
+                    payload.body.ipAddress
                 );
+                vuexContext.state.app.blockList.splice(index, 1);
             } else if (payload.path == 'remove-to-allow-list') {
-                vuexContext.state.app.allowList.splice(
-                    payload.body.ipAddress,
-                    1
+                const index = vuexContext.state.app.allowList.indexOf(
+                    payload.body.ipAddress
                 );
+                vuexContext.state.app.allowList.splice(index, 1);
             }
             return [true, response.data.message];
         } catch (error) {

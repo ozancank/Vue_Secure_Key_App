@@ -3,7 +3,7 @@ import { computed, ref, onMounted, watch } from '@vue/reactivity';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import AppNotExist from '../AppNotExist';
-import bb from 'billboard.js'
+import bb from 'billboard.js';
 
 export default {
     components: {
@@ -39,7 +39,7 @@ export default {
                 body: {
                     name: appName.value.value,
                     apiKey: appApiKey.value.value,
-                    appDescription: appDescription.value.value
+                    description: appDescription.value.value
                 }
             });
             store.commit('showAlert', {
@@ -116,33 +116,33 @@ export default {
             store.dispatch('AppModule/deleteApp', route.params.id);
         }
 
-        var chart;
+        // var chart;
 
-        // watch(appLogsGroup, (newValue, oldValue) => {
-        //     const chartItems = ['Tarihe göre istekler'];
-        //     newValue.forEach(item => chartItems.push(item.total));
-        //     chart.load({
-        //         columns: [chartItems]
+        // // watch(appLogsGroup, (newValue, oldValue) => {
+        // //     const chartItems = ['Tarihe göre istekler'];
+        // //     newValue.forEach(item => chartItems.push(item.total));
+        // //     chart.load({
+        // //         columns: [chartItems]
+        // //     });
+        // // });
+
+        // onMounted(() => {
+        //     chart = bb.generate({
+        //         data: {
+        //             columns: [
+        //                 ['data1', 30, 200, 100, 400, 150, 250],
+        //                 ['data2', 130, 100, 140, 200, 150, 50]
+        //             ],
+        //             type: 'bar' // for ESM specify as: bar()
+        //         },
+        //         bar: {
+        //             width: {
+        //                 ratio: 0.5
+        //             }
+        //         },
+        //         bindto: '#barChart'
         //     });
         // });
-
-        onMounted(() => {
-            chart = bb.generate({
-                data: {
-                    columns: [
-                        ['data1', 30, 200, 100, 400, 150, 250],
-                        ['data2', 130, 100, 140, 200, 150, 50]
-                    ],
-                    type: 'bar' // for ESM specify as: bar()
-                },
-                bar: {
-                    width: {
-                        ratio: 0.5
-                    }
-                },
-                bindto: '#barChart'
-            });
-        });
 
         return {
             user,
@@ -177,9 +177,9 @@ export default {
         </div>
 
         <div class="alert alert-primary">
-            <b>Endpoint:</b> http://localhost:3000/api-service/{{
-                app.slug
-            }}//{{ user.id }}
+            <b>Endpoint:</b> http://localhost:3000/api-service/{{ app.slug }}/{{
+                user.id
+            }}
         </div>
 
         <AppAlert></AppAlert>
@@ -189,9 +189,9 @@ export default {
             <div class="col-md-6">
                 <div>
                     <b class="mb-3">Uygulama Ayarları</b>
-                    <form>
+                    <form @submit.prevent="appDetailUpdate">
                         <div class="mb-3">
-                            <label for="appName" class="form-label"
+                            <label for="name" class="form-label"
                                 >Uygulama Adı*</label
                             >
                             <input
@@ -200,7 +200,7 @@ export default {
                                 required
                                 maxlength="50"
                                 type="text"
-                                id="appName"
+                                id="name"
                                 class="form-control"
                             />
                         </div>
@@ -219,7 +219,7 @@ export default {
                             />
                         </div>
                         <div class="mb-3">
-                            <label for="appDescription" class="form-label"
+                            <label for="description" class="form-label"
                                 >Açıklama</label
                             >
                             <textarea
@@ -227,7 +227,7 @@ export default {
                                 :value="app.description"
                                 maxlength="500"
                                 rows="3"
-                                id="appDescription"
+                                id="description"
                                 class="form-control"
                             ></textarea>
                         </div>
@@ -256,7 +256,7 @@ export default {
                 <div class="mt-5">
                     <h1>Graphichs</h1>
                     {{ logGroup }}
-                    <!-- <div id="barChart"></div> -->
+                    <div id="barChart"></div>
                 </div>
             </div>
             <div class="col-md-6">
@@ -296,14 +296,21 @@ export default {
                     <b>İzin Verilen Listesi</b>
                     <form @submit.prevent="updateIpList('allowList-add')">
                         <div class="row">
-                            <input
-                                required
-                                pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
-                                v-model="allowIpAddress"
-                                type="text"
-                                class="form-control col-md-10"
-                                placeholder="IP Adresi"
-                            />
+                            <div class="col-10">
+                                <input
+                                    required
+                                    pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                                    v-model="allowIpAddress"
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="IP Adresi"
+                                />
+                            </div>
+                            <div class="col-2">
+                                <button class="btn btn-warning">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                     </form>
                     <table class="table table-striped">
@@ -315,9 +322,18 @@ export default {
                             <tr v-for="allow in app.allowList" :key="allow">
                                 <td>{{ allow }}</td>
                                 <td>
-                                    <button class="btn btn-danger">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
+                                    <form
+                                        @submit.prevent="
+                                            updateIpList(
+                                                'allowList-remove',
+                                                allow
+                                            )
+                                        "
+                                    >
+                                        <button class="btn btn-danger">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         </tbody>
@@ -331,6 +347,25 @@ export default {
                 </div>
                 <div class="mt-2">
                     <b>Yasaklı Listesi</b>
+                    <form @submit.prevent="updateIpList('blockList-add')">
+                        <div class="row">
+                            <div class="col-10">
+                                <input
+                                    required
+                                    pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                                    v-model="blockIpAddress"
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="IP Adresi"
+                                />
+                            </div>
+                            <div class="col-2">
+                                <button class="btn btn-warning">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                     <table class="table table-striped">
                         <thead>
                             <th>IP Adresi</th>
@@ -340,9 +375,18 @@ export default {
                             <tr v-for="block in app.blockList" :key="block">
                                 <td>{{ block }}</td>
                                 <td>
-                                    <button class="btn btn-danger">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
+                                    <form
+                                        @submit.prevent="
+                                            updateIpList(
+                                                'blockList-remove',
+                                                block
+                                            )
+                                        "
+                                    >
+                                        <button class="btn btn-danger">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         </tbody>

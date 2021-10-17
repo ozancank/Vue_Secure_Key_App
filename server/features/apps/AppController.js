@@ -90,12 +90,13 @@ class AppController {
             const { id: _id } = req.params;
             const { userid: userId } = req.headers;
             const appName = await getAppName(_id);
+            const oldData = await AppModel.findOne({ _id });
             const app = await AppModel.updateOne(
                 { _id, userId },
                 {
-                    name,
-                    apiKey,
-                    description,
+                    name: name ?? oldData.appName,
+                    apiKey: apiKey ?? oldData.apiKey,
+                    description: description ?? oldData.description,
                     limit,
                     time,
                 }
@@ -265,7 +266,9 @@ class AppController {
     async getAppLogs(req, res, next) {
         try {
             const { id: appId } = req.params;
-            const logs = await AppLogModel.find({ appId });
+            const logs = await AppLogModel.find({ appId }).sort({
+                createdAt: -1,
+            });
             res.status(200).json(logs);
         } catch (error) {
             console.log(error);

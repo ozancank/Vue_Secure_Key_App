@@ -41,13 +41,14 @@ export const ipIsUnique = async (req, res, next) => {
 
 export const nameIsUnique = async (req, res, next) => {
     const { name, apiKey, description } = req.body;
+    const id = req.params.id;
     const { userid: userId } = req.headers;
     const result = validate([
         {
             text: name || '',
             check: ['required', 'maxLength:50'],
             messages: [
-                'Uygulama İsmini lütfen Belirtin',
+                'Uygulama İsmini Lütfen Belirtin',
                 'Uygulama İsmi En Fazla 50 Karakter Olabilir',
             ],
         },
@@ -55,7 +56,7 @@ export const nameIsUnique = async (req, res, next) => {
             text: apiKey || '',
             check: ['required', 'maxLength:200'],
             messages: [
-                'Api Anahtarınızı lütfen Belirtin',
+                'Api Anahtarınızı Lütfen Belirtin',
                 'Anahtar En Fazla 200 Karakter Olabilir',
             ],
         },
@@ -65,12 +66,22 @@ export const nameIsUnique = async (req, res, next) => {
             messages: ['Açıklama En Fazla 500 Karakter Olabilir'],
         },
     ]);
+
+    if (!name && !apiKey && !description) {
+        next();
+        return;
+    }
+
     if (result == true) {
-        const checkName = await AppModel.findOne({ name, userId });
-        if (!checkName) {
+        const check = await AppModel.findOne({ name, userId });
+        if (!check) {
             next();
         } else {
-            next(new Error('Bu isimde bir uygulama oluşturmuşsunuz.'));
+            if (id && check._id.toString() == id) {
+                next();
+            } else {
+                next(new Error('Bu isimde bir uygulama oluşturmuşsunuz.'));
+            }
         }
     } else {
         next(new Error(result));
